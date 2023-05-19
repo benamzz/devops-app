@@ -13,7 +13,7 @@ describe('Authentification', function () {
         agent = chai.request.agent(app);
         agent
             .post('/api/sessions')
-            .send({ email: 'test8@gmail.com', password: 'Azerty123' })
+            .send({ email: 'test@gmail.com', password: 'Azerty123' })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 authToken = res.body.authToken;
@@ -31,7 +31,7 @@ describe('Création d\'un article', function () {
         agent = chai.request.agent(app);
         agent
             .post('/api/sessions')
-            .send({ email: 'test8@gmail.com', password: 'Azerty123' })
+            .send({ email: 'test@gmail.com', password: 'Azerty123' })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 authToken = res.body.authToken;

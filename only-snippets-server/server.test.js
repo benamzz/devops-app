@@ -1,24 +1,18 @@
-const app = require('./app')
-const http = require('http');
+const request = require("supertest");
+const app = require("./app");
 
-const PORT = process.env.PORT || 5005;
-
-describe('App', () => {
+describe("Server", () => {
     let server;
 
-    beforeAll(() => {
-        server = http.createServer(app);
-        server.listen(PORT);
+    beforeAll((done) => {
+        server = app.listen(5005, done);
     });
 
     afterAll((done) => {
         server.close(done);
     });
 
-    it('should start the server and listen on the specified port', (done) => {
-        server.on('listening', () => {
-            expect(server.listening).toBeTruthy();
-            done();
-        });
+    test("should start the server and listen on the specified port", async () => {
+        expect(server.address().port).toBe(5005);
     });
 });

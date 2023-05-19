@@ -1,48 +1,24 @@
-const mongoose = require('mongoose');
+require('dotenv').config();
 
-// Fonction à tester : connectToMongoDB
-async function connectToMongoDB() {
-    const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost/only-snippet-server';
+const mongoose = require("mongoose");
 
-    try {
-        const connection = await mongoose.connect(MONGO_URI);
-        console.log(`Connected to Mongo! Database name: "${connection.connections[0].name}"`);
-        return connection;
-    } catch (error) {
-        console.error('Error connecting to mongo:', error);
-        throw error;
-    }
-}
 
-// Test unitaire
-test('connects to MongoDB successfully', async () => {
-    // Arrange (Préparation)
-    const mockConnection = {
-        connections: [{ name: 'mock-database' }],
-    };
-    mongoose.connect = jest.fn().mockResolvedValue(mockConnection);
-    console.log = jest.fn(); // Mock la fonction console.log pour vérifier l'appel
-
-    // Act (Action)
-    const result = await connectToMongoDB();
-
-    // Assert (Vérification)
-    expect(mongoose.connect).toHaveBeenCalledWith('mongodb://localhost/only-snippet-server');
-    expect(console.log).toHaveBeenCalledWith('Connected to Mongo! Database name: "mock-database"');
-    expect(result).toBe(mockConnection);
+// Connexion à la base de données avant de lancer les tests
+beforeAll(async () => {
+    const MONGO_URI = process.env.MONGODB_URI; // Utilisez une URI de base de données de test séparée si nécessaire
+    await mongoose.connect(MONGO_URI, { useNewUrlParser: true });
 });
 
-// Test unitaire avec échec de la connexion
-test('handles MongoDB connection error', async () => {
-    // Arrange (Préparation)
-    const mockError = new Error('Connection error');
-    mongoose.connect = jest.fn().mockRejectedValue(mockError);
-    console.error = jest.fn(); // Mock la fonction console.error pour vérifier l'appel
-
-    // Act (Action et vérification)
-    await expect(connectToMongoDB()).rejects.toThrowError(mockError);
-
-    // Assert (Vérification)
-    expect(mongoose.connect).toHaveBeenCalledWith('mongodb://localhost/only-snippet-server');
-    expect(console.error).toHaveBeenCalledWith('Error connecting to mongo:', mockError);
+// Déconnexion de la base de données après avoir terminé les tests
+afterAll(async () => {
+    await mongoose.disconnect();
 });
+
+// vérifier la connexion à la base de données
+describe("Database Connection", () => {
+    test("should connect to the database", () => {
+        expect(mongoose.connection.readyState).toBe(1);
+    });
+});
+
+
