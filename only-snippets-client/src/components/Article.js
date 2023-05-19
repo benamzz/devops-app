@@ -1,72 +1,74 @@
-import { Link } from 'react-router-dom'
-import { useCallback, useContext, useState } from 'react'
+import { Link } from 'react-router-dom';
+import { useCallback, useContext, useState } from 'react';
 import { AuthContext } from "../context/auth.context";
-import api from "../api"
+import api from "../api";
 
 function Article(props) {
     const { user, refresh } = useContext(AuthContext);
-    const [liked, setLiked] = useState(false)
-    const [deleted, setDeleted] = useState(false)
+    const [liked, setLiked] = useState(false);
+    const [deleted, setDeleted] = useState(false);
 
     const toggleLike = useCallback((e) => {
         e.preventDefault();
         if (user.likes.includes(props.value._id)) {
             return api().put(`/articles/${props.value._id}/unlike`)
                 .then(() => {
-                    setLiked(false)
-                    refresh()
+                    setLiked(false);
+                    refresh();
                 })
-                .catch(err => console.log(err))
+                .catch(err => console.log(err));
         }
         if (!liked) {
             return api().put(`/articles/${props.value._id}/like`)
                 .then(() => {
-                    setLiked(true)
-                    refresh()
+                    setLiked(true);
+                    refresh();
                 })
-                .catch(err => console.log(err))
+                .catch(err => console.log(err));
         }
-    }, [props.value._id, refresh, user.likes])
+    }, [props.value._id, refresh, user.likes, liked]);
 
     const deleteArticle = useCallback((e) => {
         e.preventDefault();
         return api().delete(`/articles/${props.value._id}`)
             .then(() => {
-                setDeleted(!deleted)
-                refresh()
+                setDeleted(!deleted);
+                refresh();
             })
-            .catch(err => console.log(err))
-    })
+            .catch(err => console.log(err));
+    }, [props.value._id, deleted, refresh]);
 
-    let isMyArticle = false
-    if (user._id === props.value.userId._id) { isMyArticle = true }
-    if (!props.value) return "loading"
+    let isMyArticle = false;
+    if (user && props.value.userId && user._id === props.value.userId._id) {
+        isMyArticle = true;
+    }
+    if (!props.value) return "loading";
     return (
         <div className='Article'>
             {!props.value.deletedAt &&
                 <>
                     <div className='articleContainer'>
-                        <Link to={`/users/${props.value.userId._id}`} id="userProfileLink">
-                            <img src={props.value.userId.avatarUrl} alt="avatar" />
+                        <Link to={`/users/${props.value.userId?._id}`} id="userProfileLink">
+                            <img src={props.value.userId?.avatarUrl} alt="avatar" />
                         </Link>
 
                         <Link to={`/articles/${props.value._id}`} id="articleLink">
-                            <h3>@{props.value.userId.username}</h3>
+                            <h3>@{props.value.userId?.username}</h3>
                             <p id='content'>{props.value.content}</p>
-                            <p>{props.value.snippet.tag}</p>
+                            <p>{props.value.snippet?.tag}</p>
                         </Link>
                         {isMyArticle && (
                             <div className='isMyArticle'>
                                 <div className='deleteArticleBtn' onClick={deleteArticle}>{!deleted ? "Delete" : "Deleted"}</div>
                                 <Link to={`/articles/${props.value._id}/edit`} id="editArticleLink">Edit</Link>
-                            </div>)}
+                            </div>
+                        )}
 
                     </div>
                     <div className='articleBtn'>
                         <Link to={`/articles/${props.value._id}/comment`}>{props.value.comments.length} comment(s)</Link>
-                        <div className='likeBtn' onClick={toggleLike}>{user.likes.includes(props.value._id) ? <i className="fas fa-heart"></i>
-                            : <i className="far fa-heart"></i>}</div>
-                        {props.value.snippet.content !== "" && <Link to={`/articles/${props.value._id}/snippet/${props.value.snippet._id}`}>See the Snippet</Link>}
+                        <div className='likeBtn' onClick={toggleLike}>{user.likes.includes(props.value._id) ? <i className="fas fa-heart"></i> : <i className="far fa-heart"></i>}</div>
+                        {props.value.snippet?.content !== "" && <Link id="snippet-details" to={`/articles/${props.value._id}/snippet/${props.value.snippet?._id}`}>See the Snippet</Link>}
                     </div>
                 </>
             }

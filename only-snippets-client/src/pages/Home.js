@@ -16,11 +16,13 @@ function Home() {
       .then((articles) => {
         const noCommentsFilter = articles.data.filter(el => !el.parentId)
         const followingArticles = noCommentsFilter.filter(el => {
-          return user.following.includes(el.userId._id)
-        })
+          return user && el.userId && user.following.includes(el.userId._id);
+        });
+
         const userArticles = noCommentsFilter.filter(el => {
-          return user._id === el.userId._id
-        })
+          return user && el.userId && user._id === el.userId._id;
+        });
+
         const feedArticles = followingArticles.concat(userArticles).sort((a, b) => { return (new Date(b.updatedAt) - new Date(a.updatedAt)) })
         setMyArticles(feedArticles)
       })

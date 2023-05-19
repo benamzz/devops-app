@@ -134,7 +134,7 @@ router.get("/", isAuthenticated, (req, res, next) => {
             .populate('userId', "")
             .populate('snippet')
             .then(articles => {
-                articles.map(el => el.userId.password = undefined)
+                // articles.map(el => el.userId.password = undefined)
                 res.status(200).json(articles)
             })
             .catch(err => next(err));
@@ -144,7 +144,7 @@ router.get("/", isAuthenticated, (req, res, next) => {
             .populate('userId', "")
             .populate('snippet')
             .then(articles => {
-                articles.map(el => el.userId.password = undefined)
+                // articles.map(el => el.userId.password = undefined)
                 res.status(200).json(articles)
             })
             .catch(err => next(err));
